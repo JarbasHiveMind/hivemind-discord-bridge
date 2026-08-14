@@ -1,0 +1,5 @@
+hivemind-bus-client>=1.0.13a1
+discord.py>=2.3.0
+click>=8.0
+ovos-utils
+ovos-bus-client>=2.0.0a3

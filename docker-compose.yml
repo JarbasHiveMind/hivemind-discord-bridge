@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  hivemind-discord-bridge:
+    build: .
+    image: hivemind-discord-bridge
+    restart: unless-stopped
+    environment:
+      # Discord bot token from the Developer Portal. Do NOT commit a
+      # real value here; set it in a .env file or the deployment's
+      # secret store.
+      DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
+      # HiveMind hub credentials, see `hivemind-core add-client`.
+      HIVEMIND_ACCESS_KEY: "${HIVEMIND_ACCESS_KEY}"
+      HIVEMIND_PASSWORD: "${HIVEMIND_PASSWORD}"
+      HIVEMIND_HOST: "${HIVEMIND_HOST:-ws://hivemind-core}"
+      HIVEMIND_PORT: "${HIVEMIND_PORT:-5678}"
+      HIVEMIND_SITE_ID: "${HIVEMIND_SITE_ID:-discord}"
+      HIVEMIND_LANG: "${HIVEMIND_LANG:-en-us}"
+    # if hivemind-core runs as another compose service, uncomment:
+    # depends_on:
+    #   - hivemind-core

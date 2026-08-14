@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "HiveMind-discord-bridge"
+description = "Bridge a Discord bot to a HiveMind node"
+readme = "readme.md"
+authors = [{ name = "jarbasAI", email = "jarbasai@mailfence.com" }]
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+dynamic = ["version", "dependencies"]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-asyncio"]
+
+[project.urls]
+Homepage = "https://github.com/JarbasHiveMind/hivemind-discord-bridge"
+
+[project.scripts]
+hivemind-discord-bridge = "hivemind_discord_bridge.__main__:main"
+
+[tool.setuptools]
+packages = ["hivemind_discord_bridge"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "hivemind_discord_bridge.version.__version__" }
+dependencies = { file = ["requirements.txt"] }
