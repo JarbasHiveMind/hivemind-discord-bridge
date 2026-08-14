@@ -1,0 +1,16 @@
+name: Code Coverage
+
+on:
+  pull_request:
+    branches: [feat/discord-bridge]
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/coverage.yml@dev
+    with:
+      python_version: '3.11'
+      coverage_source: 'hivemind_discord_bridge'
+      test_path: 'tests/'
+      test_extras: 'test'
+      min_coverage: 40
