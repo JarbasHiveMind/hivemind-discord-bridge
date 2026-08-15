@@ -41,6 +41,12 @@ from ovos_utils.log import LOG
 
 platform = "HiveMindDiscordBridgeV0.1"
 
+# hivemind-bus-client >= 1.0.13a1 makes HiveMessageBusClient.connect()
+# block on the handshake; handshake_max_retries=None (the client's own
+# default) retries forever. Bound it here so a stalled/unreachable hub
+# (down, wrong password) fails fast instead of hanging the bridge.
+DEFAULT_HANDSHAKE_MAX_RETRIES = 10
+
 
 class HiveMindDiscordBridge:
     """Bridge a Discord bot to a HiveMind node."""
@@ -55,6 +61,7 @@ class HiveMindDiscordBridge:
                  lang: str = "en-us",
                  site_id: str = "discord",
                  allowed_channels: Optional[Iterable[int]] = None,
+                 handshake_max_retries: int = DEFAULT_HANDSHAKE_MAX_RETRIES,
                  *,
                  client: Optional[HiveMessageBusClient] = None,
                  discord_client: Optional[discord.Client] = None):
@@ -70,6 +77,9 @@ class HiveMindDiscordBridge:
         allowed_channels: if given, only messages from these Discord
             text channel ids are forwarded (DMs are always allowed);
             leave unset to accept any channel the bot can read plus DMs.
+        handshake_max_retries: bound on HiveMessageBusClient's handshake
+            retries; without it the client's own default of None retries
+            forever and hangs the bridge if the hub never answers.
         client: pre-built HiveMessageBusClient (tests / advanced setups).
             NOTE: HiveMessageBusClient does NOT open a connection in
             __init__ -- call start() (or connect_hivemind()) to connect.
@@ -82,6 +92,7 @@ class HiveMindDiscordBridge:
         self.lang = lang
         self.site_id = site_id
         self.allowed_channels = set(allowed_channels) if allowed_channels else None
+        self.handshake_max_retries = handshake_max_retries
 
         if discord_client is not None:
             self.discord = discord_client
@@ -115,7 +126,8 @@ class HiveMindDiscordBridge:
         already starts and owns the reconnect worker thread. Never call
         ``run_forever()`` in addition to this.
         """
-        self.client.connect(site_id=self.site_id)
+        self.client.connect(site_id=self.site_id,
+                           handshake_max_retries=self.handshake_max_retries)
         self.client.on_mycroft("speak", self.handle_speak)
         self.client.on_mycroft("hive.complete_intent_failure",
                                self.handle_intent_failure)
